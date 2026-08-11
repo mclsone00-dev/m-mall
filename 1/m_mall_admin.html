@@ -39,184 +39,139 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 flex-1 w-full space-y-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Top Grid: Product Creator & Product Table -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Form -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 sticky top-20 max-h-[85vh] overflow-y-auto">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-square-plus text-[#4285F4]"></i>
+          <span>Post New Product</span>
+        </h2>
 
-      <!-- Form: Post New Product -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 sticky top-20 max-h-[85vh] overflow-y-auto">
-          <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-square-plus text-[#4285F4]"></i>
-            <span>Post New Product</span>
-          </h2>
-
-          <form id="productForm" class="space-y-3.5">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Product Title *</label>
-              <input type="text" id="title" required placeholder="e.g., Wireless Earbuds" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Price (TSh) *</label>
-              <input type="number" id="price" required min="0" placeholder="35000" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Category</label>
-              <select id="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
-                <option value="General">General</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Fashion">Fashion</option>
-                <option value="Home & Kitchen">Home & Kitchen</option>
-                <option value="Beauty">Beauty</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Description</label>
-              <textarea id="description" rows="2" placeholder="Product details..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
-            </div>
-
-            <!-- Multiple Image Uploads & URLs Section (1 to 7) -->
-            <div class="border-t border-gray-200 pt-3 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="block text-xs font-semibold text-gray-700 uppercase">Product Images (Up to 7)</span>
-                <span class="text-[10px] text-gray-400">1st is Primary</span>
-              </div>
-
-              <!-- Local File Upload -->
-              <div class="bg-blue-50/50 p-2.5 rounded border border-blue-200">
-                <label class="block text-[11px] text-gray-700 font-semibold mb-1">Option A: Local Files (Select up to 7)</label>
-                <input type="file" id="fileInput" accept="image/*" multiple class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-[#4285F4]" />
-                <p class="text-[10px] text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple image files.</p>
-              </div>
-
-              <div class="text-center text-[10px] text-gray-400 font-bold">- OR DIRECT IMAGE URLS (1 - 7) -</div>
-
-              <div class="space-y-2">
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">1. Image URL (Main)</label>
-                  <input type="url" id="imageUrl1" placeholder="https://... (Primary Image)" class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">2. Image URL 2</label>
-                  <input type="url" id="imageUrl2" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">3. Image URL 3</label>
-                  <input type="url" id="imageUrl3" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">4. Image URL 4</label>
-                  <input type="url" id="imageUrl4" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">5. Image URL 5</label>
-                  <input type="url" id="imageUrl5" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">6. Image URL 6</label>
-                  <input type="url" id="imageUrl6" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-gray-600 mb-0.5">7. Image URL 7</label>
-                  <input type="url" id="imageUrl7" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
-                </div>
-              </div>
-            </div>
-
-            <button type="submit" id="submitBtn" class="w-full bg-[#4285F4] text-white font-semibold py-2.5 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 text-sm shadow">
-              <i class="fa-solid fa-cloud-arrow-up"></i>
-              <span id="btnText">Save & Publish Product</span>
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Manage Products Table -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <i class="fa-solid fa-list-check text-[#4285F4]"></i>
-              <span>Manage Products</span>
-            </h2>
-            <span id="adminProductCount" class="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-full">0 Items</span>
+        <form id="productForm" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Product Title *</label>
+            <input type="text" id="title" required placeholder="e.g., Wireless Earbuds" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-600">
-              <thead class="bg-gray-100 text-gray-700 uppercase text-[11px]">
-                <tr>
-                  <th class="p-2.5">Item</th>
-                  <th class="p-2.5">Category</th>
-                  <th class="p-2.5">Price</th>
-                  <th class="p-2.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="adminProductTable" class="divide-y divide-gray-200">
-                <tr>
-                  <td colspan="4" class="text-center py-8 text-gray-400">Loading products...</td>
-                </tr>
-              </tbody>
-            </table>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Price (TSh) *</label>
+            <input type="number" id="price" required min="0" placeholder="35000" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
           </div>
-        </div>
-      </div>
 
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Category</label>
+            <select id="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+              <option value="General">General</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & Kitchen">Home & Kitchen</option>
+              <option value="Beauty">Beauty</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Description</label>
+            <textarea id="description" rows="2" placeholder="Product details..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+          </div>
+
+          <!-- Multiple Image Uploads & URLs Section (1 to 7) -->
+          <div class="border-t border-gray-200 pt-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="block text-xs font-semibold text-gray-700 uppercase">Product Images (Up to 7)</span>
+              <span class="text-[10px] text-gray-400">1st is Primary</span>
+            </div>
+
+            <!-- Local File Upload (Select up to 7 images) -->
+            <div class="bg-blue-50/50 p-2.5 rounded border border-blue-200">
+              <label class="block text-[11px] text-gray-700 font-semibold mb-1">Option A: Local Files (Select up to 7)</label>
+              <input type="file" id="fileInput" accept="image/*" multiple class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-[#4285F4]" />
+              <p class="text-[10px] text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple image files.</p>
+            </div>
+
+            <div class="text-center text-[10px] text-gray-400 font-bold">- OR DIRECT IMAGE URLS (1 - 7) -</div>
+
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">1. Image URL (Main)</label>
+                <input type="url" id="imageUrl1" placeholder="https://... (Primary Image)" class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">2. Image URL 2</label>
+                <input type="url" id="imageUrl2" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">3. Image URL 3</label>
+                <input type="url" id="imageUrl3" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">4. Image URL 4</label>
+                <input type="url" id="imageUrl4" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">5. Image URL 5</label>
+                <input type="url" id="imageUrl5" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">6. Image URL 6</label>
+                <input type="url" id="imageUrl6" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-gray-600 mb-0.5">7. Image URL 7</label>
+                <input type="url" id="imageUrl7" placeholder="https://..." class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs" />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="w-full bg-[#4285F4] text-white font-semibold py-2.5 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 text-sm shadow">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span id="btnText">Save & Publish Product</span>
+          </button>
+        </form>
+      </div>
     </div>
 
-    <!-- Bottom Section: Customer Orders & Live Search -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div>
+    <!-- Table -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <i class="fa-solid fa-receipt text-[#34A853]"></i>
-            <span>Customer Orders</span>
+            <i class="fa-solid fa-list-check text-[#4285F4]"></i>
+            <span>Manage Products</span>
           </h2>
-          <p class="text-xs text-gray-500">Search and track incoming marketplace purchases in real time.</p>
+          <span id="adminProductCount" class="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-full">0 Items</span>
         </div>
 
-        <div class="flex items-center gap-2 w-full sm:w-80">
-          <div class="relative w-full">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-400"></i>
-            <input 
-              type="text" 
-              id="orderSearchInput" 
-              oninput="handleOrderSearch()" 
-              placeholder="Search Order ID, Name, or Phone..." 
-              class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-          <span id="orderCount" class="text-xs bg-green-100 text-green-700 font-bold px-2.5 py-1 rounded-full whitespace-nowrap">0 Orders</span>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-100 text-gray-700 uppercase text-[11px]">
+              <tr>
+                <th class="p-2.5">Item</th>
+                <th class="p-2.5">Category</th>
+                <th class="p-2.5">Price</th>
+                <th class="p-2.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductTable" class="divide-y divide-gray-200">
+              <tr>
+                <td colspan="4" class="text-center py-8 text-gray-400">Loading products...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-600">
-          <thead class="bg-gray-100 text-gray-700 uppercase text-[11px]">
-            <tr>
-              <th class="p-2.5">Order Ref</th>
-              <th class="p-2.5">Customer details</th>
-              <th class="p-2.5">Items Purchased</th>
-              <th class="p-2.5">Total Amount</th>
-              <th class="p-2.5 text-right">Status / Action</th>
-            </tr>
-          </thead>
-          <tbody id="adminOrderTable" class="divide-y divide-gray-200">
-            <tr>
-              <td colspan="5" class="text-center py-8 text-gray-400">Loading orders...</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
 
   </main>
 
-  <!-- Edit Product Modal -->
+  <!-- Edit Modal -->
   <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-lg max-w-lg w-full p-5 shadow-xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg">
@@ -247,40 +202,40 @@
           <textarea id="editDescription" rows="2" class="w-full px-3 py-1.5 border rounded-md text-sm"></textarea>
         </div>
 
-        <!-- Optional Upload New Local Files in Edit Modal -->
-        <div class="bg-blue-50/50 p-2 rounded border border-blue-200">
-          <label class="block text-[11px] text-gray-700 font-semibold mb-0.5">Upload/Replace Local Files</label>
-          <input type="file" id="editFileInput" accept="image/*" multiple class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-[#4285F4]" />
-        </div>
-
         <!-- Edit Image URLs (1 to 7) -->
         <div class="border-t border-gray-200 pt-3 space-y-2">
           <label class="block text-xs font-semibold text-gray-700 uppercase">Product Image URLs (1 to 7)</label>
 
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">1. Image URL (Primary) *</label>
-            <input type="url" id="editImageUrl1" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
+            <input type="url" id="editImageUrl1" required class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
           </div>
+
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">2. Image URL 2</label>
             <input type="url" id="editImageUrl2" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
           </div>
+
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">3. Image URL 3</label>
             <input type="url" id="editImageUrl3" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
           </div>
+
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">4. Image URL 4</label>
             <input type="url" id="editImageUrl4" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
           </div>
+
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">5. Image URL 5</label>
             <input type="url" id="editImageUrl5" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
           </div>
+
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">6. Image URL 6</label>
             <input type="url" id="editImageUrl6" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
           </div>
+
           <div>
             <label class="block text-[11px] text-gray-600 font-medium">7. Image URL 7</label>
             <input type="url" id="editImageUrl7" class="w-full px-2.5 py-1 border rounded-md text-xs" oninput="updateEditPreviews()" />
@@ -318,9 +273,7 @@
     const CLOUDINARY_PRESET = "test_chapel";
 
     let adminProductsList = [];
-    let adminOrdersList = [];
 
-    // --- PRODUCTS FIRESTORE LISTENER ---
     db.collection('products')
       .orderBy('timestamp', 'desc')
       .onSnapshot((snapshot) => {
@@ -328,24 +281,7 @@
         snapshot.forEach((doc) => adminProductsList.push({ id: doc.id, ...doc.data() }));
         renderAdminTable(adminProductsList);
       }, (error) => {
-        console.error("Firestore product error:", error);
-      });
-
-    // --- ORDERS FIRESTORE LISTENER ---
-    db.collection('orders')
-      .orderBy('timestamp', 'desc')
-      .onSnapshot((snapshot) => {
-        adminOrdersList = [];
-        snapshot.forEach((doc) => adminOrdersList.push({ id: doc.id, ...doc.data() }));
-        handleOrderSearch(); // Renders orders with active search term filter
-      }, (error) => {
-        console.warn("Firestore order query fallback (timestamp index missing):", error);
-        // Fallback without ordering if index is unindexed
-        db.collection('orders').get().then((snapshot) => {
-          adminOrdersList = [];
-          snapshot.forEach((doc) => adminOrdersList.push({ id: doc.id, ...doc.data() }));
-          handleOrderSearch();
-        });
+        console.error("Firestore snapshot error:", error);
       });
 
     function renderAdminTable(products) {
@@ -385,68 +321,6 @@
       }).join('');
     }
 
-    function handleOrderSearch() {
-      const term = (document.getElementById('orderSearchInput')?.value || '').toLowerCase().trim();
-      
-      const filtered = adminOrdersList.filter(order => {
-        const idMatches = (order.id || '').toLowerCase().includes(term);
-        const nameMatches = (order.customerName || order.name || '').toLowerCase().includes(term);
-        const phoneMatches = (order.phone || order.phoneNumber || '').toLowerCase().includes(term);
-        return idMatches || nameMatches || phoneMatches;
-      });
-
-      renderOrderTable(filtered);
-    }
-
-    function renderOrderTable(orders) {
-      const tbody = document.getElementById('adminOrderTable');
-      document.getElementById('orderCount').innerText = `${orders.length} Orders`;
-
-      if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400">No customer orders matching search criteria.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = orders.map((order) => {
-        const customerName = escapeHtml(order.customerName || order.name || 'Anonymous Customer');
-        const phone = escapeHtml(order.phone || order.phoneNumber || 'N/A');
-        const total = Number(order.totalAmount || order.total || 0).toLocaleString();
-        const items = order.items && Array.isArray(order.items) 
-          ? order.items.map(i => `${escapeHtml(i.title || 'Product')} (x${i.quantity || 1})`).join(', ')
-          : 'Items details unavailable';
-
-        const status = order.status || 'Pending';
-        const statusClass = status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800';
-
-        return `
-          <tr class="hover:bg-gray-50 border-b border-gray-100">
-            <td class="p-2.5 text-xs font-mono font-semibold text-gray-800">#${escapeHtml(order.id.substring(0, 8))}</td>
-            <td class="p-2.5 text-xs">
-              <p class="font-bold text-gray-900">${customerName}</p>
-              <p class="text-[10px] text-gray-500"><i class="fa-solid fa-phone"></i> ${phone}</p>
-            </td>
-            <td class="p-2.5 text-xs text-gray-600 max-w-xs truncate">${items}</td>
-            <td class="p-2.5 text-xs font-semibold text-gray-900">TSh ${total}</td>
-            <td class="p-2.5 text-right space-x-1">
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded ${statusClass}">${escapeHtml(status)}</span>
-              <button onclick="toggleOrderStatus('${order.id}', '${status}')" class="text-gray-600 hover:text-black font-medium text-[11px] px-1.5 py-0.5 rounded border border-gray-300">
-                ${status === 'Pending' ? 'Mark Completed' : 'Mark Pending'}
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    async function toggleOrderStatus(orderId, currentStatus) {
-      const nextStatus = currentStatus === 'Completed' ? 'Pending' : 'Completed';
-      try {
-        await db.collection('orders').doc(orderId).update({ status: nextStatus });
-      } catch (err) {
-        alert("Failed to update status: " + err.message);
-      }
-    }
-
     async function uploadToCloudinary(file) {
       if (!file.type.startsWith('image/')) {
         throw new Error('Selected file is not an image.');
@@ -465,7 +339,6 @@
       return data.secure_url;
     }
 
-    // --- FORM SUBMIT (POST PRODUCT) ---
     document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -484,6 +357,7 @@
         const fileInput = document.getElementById('fileInput');
         let imageUrls = [];
 
+        // Check if local files were selected (up to 7)
         if (fileInput.files.length > 0) {
           if (fileInput.files.length > 7) {
             alert("You can select a maximum of 7 images from your computer.");
@@ -500,6 +374,7 @@
           }
         }
 
+        // Gather any manual Direct Image URLs (1 to 7)
         for (let i = 1; i <= 7; i++) {
           const val = document.getElementById(`imageUrl${i}`).value.trim();
           if (val && imageUrls.length < 7) {
@@ -520,8 +395,8 @@
           price,
           category,
           description,
-          imageUrl: imageUrls[0],
-          images: imageUrls.slice(0, 7),
+          imageUrl: imageUrls[0], // Primary image for backwards compatibility
+          images: imageUrls.slice(0, 7), // Array capped at 7 items
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
@@ -589,7 +464,6 @@
       document.getElementById('editModal').classList.remove('flex');
     }
 
-    // --- EDIT FORM SUBMIT ---
     document.getElementById('editForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('editId').value;
@@ -599,30 +473,19 @@
       editSubmitBtn.innerText = "Saving...";
 
       let updatedImages = [];
-      const editFileInput = document.getElementById('editFileInput');
+      for (let i = 1; i <= 7; i++) {
+        const val = document.getElementById(`editImageUrl${i}`).value.trim();
+        if (val) updatedImages.push(val);
+      }
+
+      if (updatedImages.length === 0) {
+        alert("Please provide at least 1 image URL.");
+        editSubmitBtn.disabled = false;
+        editSubmitBtn.innerText = "Save Changes";
+        return;
+      }
 
       try {
-        if (editFileInput && editFileInput.files.length > 0) {
-          const filesArray = Array.from(editFileInput.files);
-          for (let i = 0; i < filesArray.length && updatedImages.length < 7; i++) {
-            editSubmitBtn.innerText = `Uploading Image ${i + 1}...`;
-            const uploadedUrl = await uploadToCloudinary(filesArray[i]);
-            updatedImages.push(uploadedUrl);
-          }
-        }
-
-        for (let i = 1; i <= 7; i++) {
-          const val = document.getElementById(`editImageUrl${i}`).value.trim();
-          if (val && updatedImages.length < 7) updatedImages.push(val);
-        }
-
-        if (updatedImages.length === 0) {
-          alert("Please provide at least 1 image file or URL.");
-          editSubmitBtn.disabled = false;
-          editSubmitBtn.innerText = "Save Changes";
-          return;
-        }
-
         await db.collection('products').doc(id).update({
           title: document.getElementById('editTitle').value.trim(),
           price: parseFloat(document.getElementById('editPrice').value),
@@ -631,7 +494,6 @@
           imageUrl: updatedImages[0],
           images: updatedImages
         });
-
         closeModal();
       } catch (err) {
         alert("Failed to update product: " + err.message);

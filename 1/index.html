@@ -119,32 +119,6 @@
     </div>
   </div>
 
-  <!-- Order Generation & Copy Modal -->
-  <div id="orderModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4 transition-opacity">
-    <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl relative text-center border border-gray-100">
-      <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
-        <i class="fa-solid fa-check"></i>
-      </div>
-      
-      <h3 class="text-lg font-bold text-gray-900">Order Initiated!</h3>
-      <p class="text-xs text-gray-500 mt-1 mb-4">Your order document has been generated. Save this Order ID for confirmation.</p>
-
-      <!-- Order ID Box -->
-      <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center justify-between mb-4">
-        <span id="modalOrderId" class="font-mono text-sm font-bold text-[#4285F4] tracking-wider"></span>
-        <button onclick="copyOrderId()" class="text-xs text-gray-600 hover:text-black font-semibold flex items-center gap-1 bg-white border border-gray-300 px-2.5 py-1 rounded shadow-sm hover:bg-gray-100 transition">
-          <i class="fa-regular fa-copy"></i> Copy ID
-        </button>
-      </div>
-
-      <p class="text-[11px] text-gray-400 mb-5">Click below to continue to WhatsApp and complete your order details.</p>
-
-      <a id="whatsappBtn" href="#" target="_blank" onclick="closeOrderModal()" class="w-full bg-[#25D366] hover:bg-green-600 text-white font-bold py-2.5 rounded-lg text-xs shadow flex items-center justify-center gap-2 transition">
-        <i class="fa-brands fa-whatsapp text-base"></i> Proceed to WhatsApp
-      </a>
-    </div>
-  </div>
-
   <!-- Bottom Navigation (Mobile Only) -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-1.5 z-40 md:hidden shadow-lg text-gray-600">
     <a href="index.html" class="flex flex-col items-center text-[#4285F4]">
@@ -241,7 +215,7 @@
                   <span class="text-[10px] text-gray-500 font-normal">TSh</span> ${formattedPrice}
                 </div>
                 
-                <button id="btn-${product.id}" onclick="createOrderAndTriggerModal('${product.id}', '${escapeJs(product.title)}', '${product.price}', '${escapeJs(mainImageUrl)}')" 
+                <button id="btn-${product.id}" onclick="orderViaWhatsApp('${product.id}', '${escapeJs(product.title)}', '${formattedPrice}', '${escapeJs(mainImageUrl)}')" 
                   class="w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1 shadow-sm transition-all duration-150">
                   <i class="fa-brands fa-whatsapp text-sm"></i>
                   <span>Order Now</span>
@@ -281,7 +255,7 @@
       `).join('');
 
       document.getElementById('modalOrderContainer').innerHTML = `
-        <button id="btn-modal-${product.id}" onclick="createOrderAndTriggerModal('${product.id}', '${escapeJs(product.title)}', '${product.price}', '${escapeJs(imagesList[0])}')" 
+        <button id="btn-modal-${product.id}" onclick="orderViaWhatsApp('${product.id}', '${escapeJs(product.title)}', '${formattedPrice}', '${escapeJs(imagesList[0])}')" 
           class="w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-2 rounded text-xs flex items-center justify-center gap-1 shadow transition-all duration-150">
           <i class="fa-brands fa-whatsapp text-base"></i>
           <span>Order via WhatsApp</span>
@@ -337,95 +311,27 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /**
-     * Generates an Order ID: MCenter-YYYYMMDD-[6 Random Alphanumeric Characters]
-     */
-    function generateOrderId() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      const dateStr = `${year}${month}${day}`;
-
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let randomStr = '';
-      for (let i = 0; i < 6; i++) {
-        randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-
-      return `MCenter-${dateStr}-${randomStr}`;
-    }
-
-    /**
-     * Handles Firestore order document creation and WhatsApp modal display
-     */
-    async function createOrderAndTriggerModal(productId, title, price, imageUrl) {
+    function orderViaWhatsApp(productId, title, price, imageUrl) {
       const btn = document.getElementById(`btn-${productId}`) || document.getElementById(`btn-modal-${productId}`);
       
       if (btn) {
         btn.disabled = true;
         btn.className = "w-full bg-yellow-500 text-black font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1.5 shadow-sm opacity-90 cursor-wait";
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i><span>Generating Order...</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i><span>Opening WhatsApp...</span>`;
       }
 
-      const orderId = generateOrderId();
-      const numericPrice = Number(price);
-      const formattedPrice = numericPrice.toLocaleString();
+      setTimeout(() => {
+        const formattedMessage = `Hello M Mall! 👋\n\nI want to order:\n*Product:* ${title}\n*Price:* TSh ${price}\n\n*Product Image Link:*\n${imageUrl}`;
+        const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(formattedMessage)}`;
+        
+        window.open(whatsappUrl, '_blank');
 
-      try {
-        // Save order inside Firestore 'orders' collection
-        await db.collection('orders').add({
-          orderId: orderId,
-          productTitle: title,
-          price: numericPrice,
-          imageUrl: imageUrl || '',
-          status: 'Pending',
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // Formulate WhatsApp Message
-        const messageText = `Hello M Center! I would like to place an order.\n\nOrder ID: ${orderId}\nProduct: ${title}\nPrice: TSh ${formattedPrice}\nImage: ${imageUrl}`;
-        const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(messageText)}`;
-
-        // Populate Modal Details
-        document.getElementById('modalOrderId').innerText = orderId;
-        document.getElementById('whatsappBtn').href = whatsappUrl;
-
-        // Close Product Modal if open
-        closeProductModal();
-
-        // Show Order ID Confirmation Modal
-        const orderModal = document.getElementById('orderModal');
-        orderModal.classList.remove('hidden');
-        orderModal.classList.add('flex');
-
-      } catch (err) {
-        console.error("Firestore Order Error:", err);
-        alert("Failed to create order document: " + err.message);
-      } finally {
         if (btn) {
           btn.disabled = false;
           btn.className = "w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1 shadow-sm transition-all duration-150";
           btn.innerHTML = `<i class="fa-brands fa-whatsapp text-sm"></i><span>Order Now</span>`;
         }
-      }
-    }
-
-    function copyOrderId() {
-      const orderIdText = document.getElementById('modalOrderId').innerText;
-      if (!orderIdText) return;
-      
-      navigator.clipboard.writeText(orderIdText).then(() => {
-        alert("Order ID copied to clipboard!");
-      }).catch(err => {
-        console.error("Copy failed: ", err);
-      });
-    }
-
-    function closeOrderModal() {
-      const orderModal = document.getElementById('orderModal');
-      orderModal.classList.add('hidden');
-      orderModal.classList.remove('flex');
+      }, 700);
     }
 
     function escapeHtml(str) {
