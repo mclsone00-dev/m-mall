@@ -35,11 +35,12 @@
         <img src="images/logo.png" alt="M Mall" class="h-7 sm:h-9 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/100x30?text=M+Mall';" />
       </a>
 
+      <!-- Header Navigation Link: Track Order -->
       <div class="flex items-center gap-3">
-        <a href="m_mall_admin.html" class="text-xs bg-gray-800 hover:bg-gray-700 text-yellow-400 px-2.5 py-1.5 rounded-full border border-gray-700 flex items-center gap-1 font-medium">
-          <i class="fa-solid fa-user-gear"></i>
-          <span class="hidden sm:inline">Admin Portal</span>
-        </a>
+        <button onclick="openTrackOrderModal()" class="text-xs bg-gray-800 hover:bg-gray-700 text-yellow-400 px-3 py-1.5 rounded-full border border-gray-700 flex items-center gap-1.5 font-medium transition">
+          <i class="fa-solid fa-[#FBBC05] fa-truck-ramp-box text-sm"></i>
+          <span>Track Order</span>
+        </button>
       </div>
     </div>
 
@@ -83,6 +84,53 @@
       </div>
     </div>
   </main>
+
+  <!-- Track / Find Order Lookup Modal -->
+  <div id="trackOrderModal" class="fixed inset-0 z-50 hidden bg-black/70 items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 relative border border-gray-100 my-auto">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-blue-50 text-[#4285F4] flex items-center justify-center">
+            <i class="fa-solid fa-magnifying-glass-location text-sm"></i>
+          </div>
+          <h3 class="text-base font-bold text-gray-900">Track My Order</h3>
+        </div>
+        <button onclick="closeTrackOrderModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Search Input Section -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Enter Order ID</label>
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="trackOrderInput" 
+              placeholder="e.g. MCenter-20260811-A1B2C3" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#4285F4]"
+            />
+            <button 
+              onclick="searchOrder()" 
+              id="searchOrderBtn" 
+              class="bg-[#4285F4] hover:bg-blue-600 active:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm transition"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Search</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Container -->
+        <div id="trackResultContainer" class="mt-4">
+          <!-- Dynamic states (Loading, Error, Order Card) populate here -->
+          <p class="text-center text-xs text-gray-400 py-4">Enter your Order ID above to check item status.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Product Details Modal -->
   <div id="productModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-75 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
@@ -155,10 +203,11 @@
       <i class="fa-solid fa-magnifying-glass text-lg"></i>
       <span class="text-[10px] font-medium mt-0.5">Search</span>
     </button>
-    <a href="m_mall_admin.html" class="flex flex-col items-center">
-      <i class="fa-solid fa-user-gear text-lg"></i>
-      <span class="text-[10px] font-medium mt-0.5">Admin</span>
-    </a>
+    <!-- Mobile Navigation: Track Order -->
+    <button onclick="openTrackOrderModal()" class="flex flex-col items-center text-gray-600 hover:text-[#4285F4]">
+      <i class="fa-solid fa-truck-ramp-box text-lg"></i>
+      <span class="text-[10px] font-medium mt-0.5">Track Order</span>
+    </button>
   </nav>
 
   <footer class="bg-black text-gray-400 py-4 border-t border-gray-800 text-center text-xs mb-12 md:mb-0">
@@ -426,6 +475,167 @@
       const orderModal = document.getElementById('orderModal');
       orderModal.classList.add('hidden');
       orderModal.classList.remove('flex');
+    }
+
+    /* ----------------------------------------------------
+     * TRACK ORDER MODAL LOGIC & FIRESTORE SEARCH
+     * ---------------------------------------------------- */
+    function openTrackOrderModal() {
+      const modal = document.getElementById('trackOrderModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeTrackOrderModal() {
+      const modal = document.getElementById('trackOrderModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function searchOrder() {
+      const searchInput = document.getElementById('trackOrderInput').value.trim();
+      const resultContainer = document.getElementById('trackResultContainer');
+      const searchBtn = document.getElementById('searchOrderBtn');
+
+      if (!searchInput) {
+        resultContainer.innerHTML = `
+          <p class="text-center text-xs text-red-500 font-medium py-2">
+            Please enter a valid Order ID.
+          </p>`;
+        return;
+      }
+
+      // 1. Loading State
+      searchBtn.disabled = true;
+      searchBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i><span>Searching</span>`;
+      resultContainer.innerHTML = `
+        <div class="text-center py-6">
+          <i class="fa-solid fa-circle-notch fa-spin text-2xl text-[#4285F4] mb-2"></i>
+          <p class="text-xs text-gray-500">Searching order record...</p>
+        </div>`;
+
+      try {
+        // Query Firestore orders collection where orderId == searchInput
+        const snapshot = await db.collection('orders').where('orderId', '==', searchInput).get();
+
+        // 2. Not Found State
+        if (snapshot.empty) {
+          resultContainer.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+              <i class="fa-solid fa-circle-xmark text-red-500 text-2xl mb-1"></i>
+              <p class="text-xs font-bold text-red-700">Order Not Found</p>
+              <p class="text-[11px] text-red-600 mt-0.5">Double check your Order ID and try again.</p>
+            </div>`;
+          return;
+        }
+
+        // 3. Order Found State
+        const doc = snapshot.docs[0];
+        const orderData = doc.data();
+        const docId = doc.id;
+
+        renderOrderSearchResult(docId, orderData);
+
+      } catch (err) {
+        console.error("Track order query error:", err);
+        resultContainer.innerHTML = `
+          <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center text-xs text-red-600">
+            Error retrieving order details: ${escapeHtml(err.message)}
+          </div>`;
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i><span>Search</span>`;
+      }
+    }
+
+    function renderOrderSearchResult(docId, order) {
+      const resultContainer = document.getElementById('trackResultContainer');
+      const formattedPrice = Number(order.price || 0).toLocaleString();
+      
+      // Parse created date
+      let dateString = 'N/A';
+      if (order.createdAt && typeof order.createdAt.toDate === 'function') {
+        dateString = order.createdAt.toDate().toLocaleDateString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      const isPending = order.status === 'Pending';
+      const isConfirmed = order.status === 'Confirmed';
+
+      const statusBadge = isConfirmed 
+        ? `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-[#34A853] fa-circle-check"></i> Order Confirmed</span>`
+        : `<span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-clock"></i> Pending Confirmation</span>`;
+
+      const confirmButtonHtml = isPending 
+        ? `<button id="confirmOrderBtn" onclick="confirmOrder('${docId}')" class="w-full mt-3 bg-[#34A853] hover:bg-green-600 active:bg-green-700 text-white font-bold py-2 rounded-lg text-xs shadow-sm flex items-center justify-center gap-1.5 transition">
+             <i class="fa-solid fa-check"></i>
+             <span>Confirm Order</span>
+           </button>`
+        : '';
+
+      resultContainer.innerHTML = `
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left space-y-3">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400">Order ID</p>
+              <p class="text-xs font-mono font-bold text-[#4285F4]">${escapeHtml(order.orderId)}</p>
+            </div>
+            <div id="statusBadgeContainer">${statusBadge}</div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <img 
+              src="${escapeHtml(order.imageUrl || 'https://via.placeholder.com/80?text=No+Image')}" 
+              alt="Product Thumbnail" 
+              class="w-14 h-14 object-cover rounded border border-gray-200 bg-white flex-shrink-0"
+              onerror="this.src='https://via.placeholder.com/80?text=Error';"
+            />
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-bold text-gray-900 truncate">${escapeHtml(order.productTitle || 'Product')}</h4>
+              <p class="text-xs font-extrabold text-gray-900 mt-0.5"><span class="text-[10px] font-normal text-gray-500">TSh</span> ${formattedPrice}</p>
+              <p class="text-[10px] text-gray-400 mt-1"><i class="fa-regular fa-calendar"></i> ${dateString}</p>
+            </div>
+          </div>
+
+          <div id="actionBtnContainer">${confirmButtonHtml}</div>
+        </div>`;
+    }
+
+    async function confirmOrder(docId) {
+      const confirmBtn = document.getElementById('confirmOrderBtn');
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i><span>Updating...</span>`;
+      }
+
+      try {
+        // Update document status in Firestore
+        await db.collection('orders').doc(docId).update({
+          status: 'Confirmed',
+          confirmedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Update UI Badge dynamically
+        const badgeContainer = document.getElementById('statusBadgeContainer');
+        if (badgeContainer) {
+          badgeContainer.innerHTML = `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-[#34A853] fa-circle-check"></i> Order Confirmed</span>`;
+        }
+
+        // Remove the confirm button
+        const actionContainer = document.getElementById('actionBtnContainer');
+        if (actionContainer) {
+          actionContainer.innerHTML = '';
+        }
+
+      } catch (err) {
+        console.error("Order confirmation error:", err);
+        alert("Failed to confirm order: " + err.message);
+        if (confirmBtn) {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = `<i class="fa-solid fa-check"></i><span>Confirm Order</span>`;
+        }
+      }
     }
 
     function escapeHtml(str) {
