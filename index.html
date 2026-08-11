@@ -118,7 +118,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Configured with your WhatsApp phone number
     const WHATSAPP_PHONE = "255778743765";
 
     let allProducts = [];
@@ -217,9 +216,10 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Direct Link Order Handler (Formatted for WhatsApp link previews)
     function orderViaWhatsApp(title, price, imageUrl) {
-      const textMessage = `Hello! I would like to order *${title}* priced at *TSh ${price}*. Image: ${imageUrl}`;
-      const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(textMessage)}`;
+      const formattedMessage = `Hello M Mall! 👋\n\nI want to order:\n*Product:* ${title}\n*Price:* TSh ${price}\n\n*Product Image Link:*\n${imageUrl}`;
+      const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(formattedMessage)}`;
       window.open(whatsappUrl, '_blank');
     }
 
