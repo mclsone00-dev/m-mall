@@ -174,8 +174,8 @@
                   <span class="text-[10px] text-gray-500 font-normal">TSh</span> ${formattedPrice}
                 </div>
                 
-                <button onclick="orderViaWhatsApp('${escapeJs(product.title)}', '${formattedPrice}', '${escapeJs(imageUrl)}')" 
-                  class="w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1 shadow-sm">
+                <button id="btn-${product.id}" onclick="orderViaWhatsApp('${product.id}', '${escapeJs(product.title)}', '${formattedPrice}', '${escapeJs(imageUrl)}')" 
+                  class="w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1 shadow-sm transition-all duration-150">
                   <i class="fa-brands fa-whatsapp text-sm"></i>
                   <span>Order Now</span>
                 </button>
@@ -216,11 +216,28 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Direct Link Order Handler (Formatted for WhatsApp link previews)
-    function orderViaWhatsApp(title, price, imageUrl) {
-      const formattedMessage = `Hello M Mall! 👋\n\nI want to order:\n*Product:* ${title}\n*Price:* TSh ${price}\n\n*Product Image Link:*\n${imageUrl}`;
-      const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(formattedMessage)}`;
-      window.open(whatsappUrl, '_blank');
+    // Direct Link Order Handler with Visual Loading State
+    function orderViaWhatsApp(productId, title, price, imageUrl) {
+      const btn = document.getElementById(`btn-${productId}`);
+      
+      if (btn) {
+        btn.disabled = true;
+        btn.className = "w-full bg-yellow-500 text-black font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1.5 shadow-sm opacity-90 cursor-wait";
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i><span>Opening WhatsApp...</span>`;
+      }
+
+      setTimeout(() => {
+        const formattedMessage = `Hello M Mall! 👋\n\nI want to order:\n*Product:* ${title}\n*Price:* TSh ${price}\n\n*Product Image Link:*\n${imageUrl}`;
+        const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(formattedMessage)}`;
+        
+        window.open(whatsappUrl, '_blank');
+
+        if (btn) {
+          btn.disabled = false;
+          btn.className = "w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1 shadow-sm transition-all duration-150";
+          btn.innerHTML = `<i class="fa-brands fa-whatsapp text-sm"></i><span>Order Now</span>`;
+        }
+      }, 700);
     }
 
     function escapeHtml(str) {
