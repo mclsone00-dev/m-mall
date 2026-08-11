@@ -28,9 +28,6 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 antialiased min-h-screen flex flex-col pb-16 md:pb-0 select-none">
 
-  <!-- Toast Notification Container -->
-  <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
-
   <!-- Header -->
   <header class="bg-black text-white sticky top-0 z-50 shadow-md">
     <div class="max-w-7xl mx-auto px-3 py-2 flex items-center justify-between gap-2">
@@ -49,11 +46,8 @@
 
     <!-- Search Bar -->
     <div class="max-w-7xl mx-auto px-3 pb-2.5">
-      <div class="flex rounded-lg overflow-hidden bg-white text-gray-800 shadow-inner relative">
-        <input type="text" id="searchInput" placeholder="Search M Mall products..." class="w-full pl-3 pr-8 py-2 text-sm focus:outline-none" />
-        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 px-2 py-1">
-          <i class="fa-solid fa-xmark text-xs"></i>
-        </button>
+      <div class="flex rounded-lg overflow-hidden bg-white text-gray-800 shadow-inner">
+        <input type="text" id="searchInput" placeholder="Search M Mall products..." class="w-full px-3 py-2 text-sm focus:outline-none" />
         <button id="searchBtn" class="bg-[#FBBC05] px-4 py-2 text-black active:bg-yellow-500">
           <i class="fa-solid fa-magnifying-glass text-base"></i>
         </button>
@@ -116,7 +110,6 @@
               type="text" 
               id="trackOrderInput" 
               placeholder="e.g. MCenter-20260811-A1B2C3" 
-              onkeydown="if(event.key === 'Enter') searchOrder()"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#4285F4]"
             />
             <button 
@@ -132,6 +125,7 @@
 
         <!-- Result Container -->
         <div id="trackResultContainer" class="mt-4">
+          <!-- Dynamic states (Loading, Error, Order Card) populate here -->
           <p class="text-center text-xs text-gray-400 py-4">Enter your Order ID above to check item status.</p>
         </div>
       </div>
@@ -161,29 +155,13 @@
           <div>
             <span id="modalCategory" class="text-[10px] bg-black text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider"></span>
             <h2 id="modalTitle" class="text-base sm:text-lg font-bold text-gray-900 mt-2 leading-tight"></h2>
-            <div class="text-lg font-black text-gray-900 my-2 flex items-baseline gap-1">
-              <span class="text-xs font-normal text-gray-500">TSh</span>
-              <span id="modalPrice"></span>
+            <div class="text-lg font-black text-gray-900 my-2">
+              <span class="text-xs font-normal text-gray-500">TSh</span> <span id="modalPrice"></span>
             </div>
-            <p id="modalDescription" class="text-xs text-gray-600 leading-relaxed max-h-32 overflow-y-auto pr-1 my-2 whitespace-pre-line"></p>
+            <p id="modalDescription" class="text-xs text-gray-600 leading-relaxed max-h-36 overflow-y-auto pr-1 my-2 whitespace-pre-line"></p>
           </div>
 
-          <!-- Quantity Selector -->
-          <div class="my-3 border-t border-gray-100 pt-3">
-            <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Quantity</label>
-            <div class="flex items-center gap-3">
-              <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                <button onclick="updateModalQuantity(-1)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm">-</button>
-                <span id="modalQuantity" class="px-4 py-1 text-xs font-bold text-gray-800">1</span>
-                <button onclick="updateModalQuantity(1)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm">+</button>
-              </div>
-              <div class="text-xs text-gray-500">
-                Total: <span class="font-bold text-gray-900">TSh <span id="modalTotalPrice">0</span></span>
-              </div>
-            </div>
-          </div>
-
-          <div id="modalOrderContainer" class="mt-2"></div>
+          <div id="modalOrderContainer" class="mt-4"></div>
         </div>
       </div>
     </div>
@@ -198,13 +176,6 @@
       
       <h3 class="text-lg font-bold text-gray-900">Order Initiated!</h3>
       <p class="text-xs text-gray-500 mt-1 mb-4">Your order document has been generated. Save this Order ID for confirmation.</p>
-
-      <!-- Order Details Summary -->
-      <div id="orderModalDetails" class="text-left bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3 text-xs space-y-1">
-        <div class="flex justify-between text-gray-600"><span>Item:</span> <span id="summaryTitle" class="font-bold text-gray-900 truncate ml-2"></span></div>
-        <div class="flex justify-between text-gray-600"><span>Quantity:</span> <span id="summaryQty" class="font-bold text-gray-900"></span></div>
-        <div class="flex justify-between text-gray-600"><span>Total:</span> <span id="summaryTotal" class="font-bold text-[#34A853]"></span></div>
-      </div>
 
       <!-- Order ID Box -->
       <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center justify-between mb-4">
@@ -261,8 +232,6 @@
 
     let allProducts = [];
     let activeCategory = 'All';
-    let currentModalProduct = null;
-    let currentModalQuantity = 1;
 
     db.collection('products')
       .orderBy('timestamp', 'desc')
@@ -277,23 +246,6 @@
             Failed to load products.
           </div>`;
       });
-
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      const bgColor = type === 'success' ? 'bg-gray-900 text-white' : 'bg-red-600 text-white';
-      const icon = type === 'success' ? 'fa-circle-check text-[#34A853]' : 'fa-circle-exclamation';
-
-      toast.className = `pointer-events-auto ${bgColor} px-3 py-2.5 rounded-lg shadow-xl text-xs flex items-center gap-2 transition-all transform translate-y-2 opacity-0`;
-      toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i> <span>${escapeHtml(message)}</span>`;
-
-      container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
-      setTimeout(() => {
-        toast.classList.add('opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
 
     function renderProducts(products) {
       const grid = document.getElementById('productGrid');
@@ -338,7 +290,7 @@
                   <span class="text-[10px] text-gray-500 font-normal">TSh</span> ${formattedPrice}
                 </div>
                 
-                <button id="btn-${product.id}" onclick="createOrderAndTriggerModal('${product.id}', '${escapeJs(product.title)}', '${product.price}', '${escapeJs(mainImageUrl)}', 1)" 
+                <button id="btn-${product.id}" onclick="createOrderAndTriggerModal('${product.id}', '${escapeJs(product.title)}', '${product.price}', '${escapeJs(mainImageUrl)}')" 
                   class="w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-1.5 rounded text-xs flex items-center justify-center gap-1 shadow-sm transition-all duration-150">
                   <i class="fa-brands fa-whatsapp text-sm"></i>
                   <span>Order Now</span>
@@ -353,9 +305,6 @@
       const product = allProducts.find(p => p.id === productId);
       if (!product) return;
 
-      currentModalProduct = product;
-      currentModalQuantity = 1;
-
       const imagesList = Array.isArray(product.images) && product.images.length > 0 
         ? product.images 
         : [product.imageUrl || 'https://via.placeholder.com/200x200?text=No+Image'];
@@ -366,8 +315,6 @@
       document.getElementById('modalCategory').innerText = product.category || 'General';
       document.getElementById('modalPrice').innerText = formattedPrice;
       document.getElementById('modalDescription').innerText = product.description || 'No description available.';
-      document.getElementById('modalQuantity').innerText = '1';
-      document.getElementById('modalTotalPrice').innerText = formattedPrice;
       
       const mainImg = document.getElementById('modalMainImage');
       mainImg.src = imagesList[0];
@@ -382,32 +329,15 @@
         />
       `).join('');
 
-      renderModalOrderButton();
-      document.getElementById('productModal').classList.remove('hidden');
-    }
-
-    function updateModalQuantity(delta) {
-      if (!currentModalProduct) return;
-      currentModalQuantity = Math.max(1, currentModalQuantity + delta);
-      document.getElementById('modalQuantity').innerText = currentModalQuantity;
-      const total = Number(currentModalProduct.price) * currentModalQuantity;
-      document.getElementById('modalTotalPrice').innerText = total.toLocaleString();
-      renderModalOrderButton();
-    }
-
-    function renderModalOrderButton() {
-      if (!currentModalProduct) return;
-      const imagesList = Array.isArray(currentModalProduct.images) && currentModalProduct.images.length > 0 
-        ? currentModalProduct.images 
-        : [currentModalProduct.imageUrl || 'https://via.placeholder.com/200x200?text=No+Image'];
-
       document.getElementById('modalOrderContainer').innerHTML = `
-        <button id="btn-modal-${currentModalProduct.id}" onclick="createOrderAndTriggerModal('${currentModalProduct.id}', '${escapeJs(currentModalProduct.title)}', '${currentModalProduct.price}', '${escapeJs(imagesList[0])}', ${currentModalQuantity})" 
+        <button id="btn-modal-${product.id}" onclick="createOrderAndTriggerModal('${product.id}', '${escapeJs(product.title)}', '${product.price}', '${escapeJs(imagesList[0])}')" 
           class="w-full bg-[#34A853] active:bg-green-700 text-white font-bold py-2 rounded text-xs flex items-center justify-center gap-1 shadow transition-all duration-150">
           <i class="fa-brands fa-whatsapp text-base"></i>
-          <span>Order ${currentModalQuantity}x via WhatsApp</span>
+          <span>Order via WhatsApp</span>
         </button>
       `;
+
+      document.getElementById('productModal').classList.remove('hidden');
     }
 
     function setModalMainImage(imgUrl, thumbElement) {
@@ -423,8 +353,6 @@
 
     function closeProductModal() {
       document.getElementById('productModal').classList.add('hidden');
-      currentModalProduct = null;
-      currentModalQuantity = 1;
     }
 
     function selectCategory(cat) {
@@ -440,29 +368,13 @@
     }
 
     function filterAndRender() {
-      const input = document.getElementById('searchInput');
-      const clearBtn = document.getElementById('clearSearchBtn');
-      const query = input.value.toLowerCase().trim();
-
-      if (query.length > 0) {
-        clearBtn.classList.remove('hidden');
-      } else {
-        clearBtn.classList.add('hidden');
-      }
-
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
       const filtered = allProducts.filter((p) => {
         const matchesCat = activeCategory === 'All' || (p.category && p.category === activeCategory);
         const matchesQuery = p.title.toLowerCase().includes(query) || (p.description && p.description.toLowerCase().includes(query));
         return matchesCat && matchesQuery;
       });
       renderProducts(filtered);
-    }
-
-    function clearSearch() {
-      const input = document.getElementById('searchInput');
-      input.value = '';
-      filterAndRender();
-      input.focus();
     }
 
     document.getElementById('searchInput').addEventListener('input', filterAndRender);
@@ -474,6 +386,9 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    /**
+     * Generates an Order ID: MCenter-YYYYMMDD-[6 Random Alphanumeric Characters]
+     */
     function generateOrderId() {
       const today = new Date();
       const year = today.getFullYear();
@@ -490,7 +405,10 @@
       return `MCenter-${dateStr}-${randomStr}`;
     }
 
-    async function createOrderAndTriggerModal(productId, title, price, imageUrl, quantity = 1) {
+    /**
+     * Handles Firestore order document creation and WhatsApp modal display
+     */
+    async function createOrderAndTriggerModal(productId, title, price, imageUrl) {
       const btn = document.getElementById(`btn-${productId}`) || document.getElementById(`btn-modal-${productId}`);
       
       if (btn) {
@@ -501,41 +419,38 @@
 
       const orderId = generateOrderId();
       const numericPrice = Number(price);
-      const qty = Number(quantity) || 1;
-      const totalPrice = numericPrice * qty;
-      const formattedTotal = totalPrice.toLocaleString();
+      const formattedPrice = numericPrice.toLocaleString();
 
       try {
+        // Save order inside Firestore 'orders' collection
         await db.collection('orders').add({
           orderId: orderId,
           productTitle: title,
           price: numericPrice,
-          quantity: qty,
-          totalPrice: totalPrice,
           imageUrl: imageUrl || '',
           status: 'Pending',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        const qtyText = qty > 1 ? ` (Qty: ${qty})` : '';
-        const messageText = `Hello M Center! I would like to place an order.\n\nOrder ID: ${orderId}\nProduct: ${title}${qtyText}\nTotal Price: TSh ${formattedTotal}\nImage: ${imageUrl}`;
+        // Formulate WhatsApp Message
+        const messageText = `Hello M Center! I would like to place an order.\n\nOrder ID: ${orderId}\nProduct: ${title}\nPrice: TSh ${formattedPrice}\nImage: ${imageUrl}`;
         const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(messageText)}`;
 
+        // Populate Modal Details
         document.getElementById('modalOrderId').innerText = orderId;
-        document.getElementById('summaryTitle').innerText = title;
-        document.getElementById('summaryQty').innerText = `${qty} pcs`;
-        document.getElementById('summaryTotal').innerText = `TSh ${formattedTotal}`;
         document.getElementById('whatsappBtn').href = whatsappUrl;
 
+        // Close Product Modal if open
         closeProductModal();
 
+        // Show Order ID Confirmation Modal
         const orderModal = document.getElementById('orderModal');
         orderModal.classList.remove('hidden');
         orderModal.classList.add('flex');
 
       } catch (err) {
         console.error("Firestore Order Error:", err);
-        showToast("Failed to create order document: " + err.message, "error");
+        alert("Failed to create order document: " + err.message);
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -550,7 +465,7 @@
       if (!orderIdText) return;
       
       navigator.clipboard.writeText(orderIdText).then(() => {
-        showToast("Order ID copied to clipboard!", "success");
+        alert("Order ID copied to clipboard!");
       }).catch(err => {
         console.error("Copy failed: ", err);
       });
@@ -562,6 +477,9 @@
       orderModal.classList.remove('flex');
     }
 
+    /* ----------------------------------------------------
+     * TRACK ORDER MODAL LOGIC & FIRESTORE SEARCH
+     * ---------------------------------------------------- */
     function openTrackOrderModal() {
       const modal = document.getElementById('trackOrderModal');
       modal.classList.remove('hidden');
@@ -587,6 +505,7 @@
         return;
       }
 
+      // 1. Loading State
       searchBtn.disabled = true;
       searchBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i><span>Searching</span>`;
       resultContainer.innerHTML = `
@@ -596,8 +515,10 @@
         </div>`;
 
       try {
+        // Query Firestore orders collection where orderId == searchInput
         const snapshot = await db.collection('orders').where('orderId', '==', searchInput).get();
 
+        // 2. Not Found State
         if (snapshot.empty) {
           resultContainer.innerHTML = `
             <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
@@ -608,6 +529,7 @@
           return;
         }
 
+        // 3. Order Found State
         const doc = snapshot.docs[0];
         const orderData = doc.data();
         const docId = doc.id;
@@ -628,10 +550,9 @@
 
     function renderOrderSearchResult(docId, order) {
       const resultContainer = document.getElementById('trackResultContainer');
-      const qty = order.quantity || 1;
-      const displayPrice = order.totalPrice || (order.price * qty) || 0;
-      const formattedPrice = Number(displayPrice).toLocaleString();
+      const formattedPrice = Number(order.price || 0).toLocaleString();
       
+      // Parse created date
       let dateString = 'N/A';
       if (order.createdAt && typeof order.createdAt.toDate === 'function') {
         dateString = order.createdAt.toDate().toLocaleDateString('en-US', {
@@ -672,7 +593,6 @@
             />
             <div class="flex-1 min-w-0">
               <h4 class="text-xs font-bold text-gray-900 truncate">${escapeHtml(order.productTitle || 'Product')}</h4>
-              <p class="text-[10px] text-gray-500">Qty: <span class="font-bold text-gray-800">${qty}</span></p>
               <p class="text-xs font-extrabold text-gray-900 mt-0.5"><span class="text-[10px] font-normal text-gray-500">TSh</span> ${formattedPrice}</p>
               <p class="text-[10px] text-gray-400 mt-1"><i class="fa-regular fa-calendar"></i> ${dateString}</p>
             </div>
@@ -690,26 +610,27 @@
       }
 
       try {
+        // Update document status in Firestore
         await db.collection('orders').doc(docId).update({
           status: 'Confirmed',
           confirmedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+        // Update UI Badge dynamically
         const badgeContainer = document.getElementById('statusBadgeContainer');
         if (badgeContainer) {
           badgeContainer.innerHTML = `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-[#34A853] fa-circle-check"></i> Order Confirmed</span>`;
         }
 
+        // Remove the confirm button
         const actionContainer = document.getElementById('actionBtnContainer');
         if (actionContainer) {
           actionContainer.innerHTML = '';
         }
 
-        showToast("Order status updated to Confirmed!", "success");
-
       } catch (err) {
         console.error("Order confirmation error:", err);
-        showToast("Failed to confirm order: " + err.message, "error");
+        alert("Failed to confirm order: " + err.message);
         if (confirmBtn) {
           confirmBtn.disabled = false;
           confirmBtn.innerHTML = `<i class="fa-solid fa-check"></i><span>Confirm Order</span>`;

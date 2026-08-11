@@ -337,9 +337,10 @@
       .onSnapshot((snapshot) => {
         adminOrdersList = [];
         snapshot.forEach((doc) => adminOrdersList.push({ id: doc.id, ...doc.data() }));
-        handleOrderSearch();
+        handleOrderSearch(); // Renders orders with active search term filter
       }, (error) => {
         console.warn("Firestore order query fallback (timestamp index missing):", error);
+        // Fallback without ordering if index is unindexed
         db.collection('orders').get().then((snapshot) => {
           adminOrdersList = [];
           snapshot.forEach((doc) => adminOrdersList.push({ id: doc.id, ...doc.data() }));
@@ -501,7 +502,7 @@
 
         for (let i = 1; i <= 7; i++) {
           const val = document.getElementById(`imageUrl${i}`).value.trim();
-          if (val && imageUrls.length < 7 && !imageUrls.includes(val)) {
+          if (val && imageUrls.length < 7) {
             imageUrls.push(val);
           }
         }
@@ -584,9 +585,6 @@
     }
 
     function closeModal() {
-      const editFileInput = document.getElementById('editFileInput');
-      if (editFileInput) editFileInput.value = '';
-      
       document.getElementById('editModal').classList.add('hidden');
       document.getElementById('editModal').classList.remove('flex');
     }
@@ -615,9 +613,7 @@
 
         for (let i = 1; i <= 7; i++) {
           const val = document.getElementById(`editImageUrl${i}`).value.trim();
-          if (val && updatedImages.length < 7 && !updatedImages.includes(val)) {
-            updatedImages.push(val);
-          }
+          if (val && updatedImages.length < 7) updatedImages.push(val);
         }
 
         if (updatedImages.length === 0) {
